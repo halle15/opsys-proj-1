@@ -7,27 +7,36 @@
 void *runner(void *param);
 void *runner1(void *param);
 
+/// @brief this structure is used to easily pass information to the individual thread functions.
 typedef struct
 {
     int *array;
     int len;
 } ArrayData;
 
+/// @brief this function is meant to be used as a comparator function for the qsort() algorithm.
+/// @param a the first param to be compared
+/// @param b the second param to be compared
+/// @return value to be used by qsort to determine order or arrays.
 int cmpfnc(const void *a, const void *b)
 {
     return (*(int *)a - *(int *)b);
 }
 
+/// @brief this function quickly takes in an array and prints the contents.
+/// @param intArray the array to be listed
+/// @param arrLength the length of the array
 void printer(int intArray[], int arrLength)
 {
-    printf("len: %d\n", arrLength);
     for (int i = 0; i < arrLength; i++)
     {
-
         printf("SLOT %d | %d\n", i + 1, intArray[i]);
     }
 }
 
+/// @brief this function quickly fills an array with 0's.
+/// @param intArray the array to be cleaned
+/// @param arrLength the length of the array
 void cleaner(int intArray[], int arrLength)
 {
     printf("len: %d\n", arrLength);
@@ -37,39 +46,58 @@ void cleaner(int intArray[], int arrLength)
     }
 }
 
-
-void merge(int arr1[], int size1, int arr2[], int size2, int merged[]){
+/// @brief function to take two arrays, the size of two arrays, and the intended array to output to and merges the two arrays to be in ascending order.
+/// @param arr1 first array
+/// @param size1 first array's size
+/// @param arr2 second array
+/// @param size2 second array's size
+/// @param merged array to be merged into.
+void merge(int arr1[], int size1, int arr2[], int size2, int merged[])
+{
+    
+    // init 3 index values
     int index1 = 0;
     int index2 = 0;
     int indexResult = 0;
 
-    while(index1 < size1 && index2 < size2){
-        if(arr1[index1] <= arr2[index2]){
+
+    // Traverse both arrays at the same time until one is fully processed
+    while (index1 < size1 && index2 < size2)
+    {   
+        // if first element is lteq to second element, add first to the result.
+        if (arr1[index1] <= arr2[index2])
+        {
             merged[indexResult] = arr1[index1];
             index1++;
         }
-        else{
+        // otherwise, do so for the second to the result.
+        else
+        {
             merged[indexResult] = arr2[index2];
             index2++;
         }
         indexResult++;
     }
 
-    // copy remainder elements
-    while(index1 < size1){
+    // copy remainder elements after one is completed processing.
+    while (index1 < size1)
+    {
         merged[indexResult] = arr1[index1];
         index1++;
         indexResult++;
     }
 
-    while(index2 < size2){
-        merged[indexResult] == arr2[index2];
+    while (index2 < size2)
+    {
+        merged[indexResult] = arr2[index2];
         index2++;
         indexResult++;
     }
-    
 }
 
+/// @brief the main function loop responsible for taking in user input, taking in the numbers to be sorted, 
+/// calling the sorting threads, then for the final merge and output to user.
+/// @return returns 1 on success, exception or -1 on failure.
 int main(int argc, char *argv[])
 {
 
@@ -103,10 +131,6 @@ int main(int argc, char *argv[])
     ArrayData array1_data = {array1, array1_size};
     ArrayData array2_data = {array2, array2_size};
 
-    printer(array1, array1_size);
-    printf("SECOND ARRAY\n");
-    printer(array2, array2_size);
-
     pthread_t tid;       /* thread identifier */
     pthread_attr_t attr; /* thread attributes */
 
@@ -124,28 +148,21 @@ int main(int argc, char *argv[])
     pthread_join(tid, NULL);
     pthread_join(tid2, NULL);
 
-    printer(array1_data.array, array1_size);
-    printer(array2_data.array, array2_size);
-
     cleaner(sortArray, original_array_size);
-    printer(sortArray, original_array_size);
-    
+
     merge(array1_data.array, array1_size, array2_data.array, array2_size, sortArray);
 
     printer(sortArray, original_array_size);
 
-    // create two threads w attrs
-
-    // create/find a sorting function for the array
-
-    // figure out how to join the remaining two arrays together.
-
     return 0;
 }
 
+/// @brief
+/// @param param
+/// @return
 void *runner(void *param)
 {
-    ArrayData *data = (ArrayData *) param;
+    ArrayData *data = (ArrayData *)param;
     int *array = data->array;
     int len = data->len;
 
@@ -154,7 +171,7 @@ void *runner(void *param)
 
 void *runner1(void *param)
 {
-    ArrayData *data = (ArrayData *) param;
+    ArrayData *data = (ArrayData *)param;
     int *array = data->array;
     int len = data->len;
 
