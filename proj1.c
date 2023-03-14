@@ -5,7 +5,7 @@
 
 /* threads call this function */
 void *runner(void *param);
-void *runner2(void *param);
+void *runner1(void *param);
 
 typedef struct
 {
@@ -28,6 +28,48 @@ void printer(int intArray[], int arrLength)
     }
 }
 
+void cleaner(int intArray[], int arrLength)
+{
+    printf("len: %d\n", arrLength);
+    for (int i = 0; i < arrLength; i++)
+    {
+        intArray[i] = 0;
+    }
+}
+
+
+void merge(int arr1[], int size1, int arr2[], int size2, int merged[]){
+    int index1 = 0;
+    int index2 = 0;
+    int indexResult = 0;
+
+    while(index1 < size1 && index2 < size2){
+        if(arr1[index1] <= arr2[index2]){
+            merged[indexResult] = arr1[index1];
+            index1++;
+        }
+        else{
+            merged[indexResult] = arr2[index2];
+            index2++;
+        }
+        indexResult++;
+    }
+
+    // copy remainder elements
+    while(index1 < size1){
+        merged[indexResult] = arr1[index1];
+        index1++;
+        indexResult++;
+    }
+
+    while(index2 < size2){
+        merged[indexResult] == arr2[index2];
+        index2++;
+        indexResult++;
+    }
+    
+}
+
 int main(int argc, char *argv[])
 {
 
@@ -37,11 +79,11 @@ int main(int argc, char *argv[])
 
     scanf("%d", &original_array_size);
 
-    int toSortArray[original_array_size];
+    int sortArray[original_array_size];
 
     for (int i = 0; i < original_array_size; i++)
     {
-        scanf("%d", &toSortArray[i]);
+        scanf("%d", &sortArray[i]);
     }
 
     int array1_size = original_array_size / 2;
@@ -51,11 +93,11 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < array1_size; i++)
     {
-        array1[i] = toSortArray[i];
+        array1[i] = sortArray[i];
     }
     for (int i = array1_size; i < original_array_size; i++)
     {
-        array2[i - array1_size] = toSortArray[i];
+        array2[i - array1_size] = sortArray[i];
     }
 
     ArrayData array1_data = {array1, array1_size};
@@ -77,13 +119,20 @@ int main(int argc, char *argv[])
     printf("Calculating\n");
 
     pthread_create(&tid, &attr, runner, &array1_data);
-    pthread_create(&tid2, &attr, runner, &array2_data);
+    pthread_create(&tid2, &attr, runner1, &array2_data);
 
     pthread_join(tid, NULL);
     pthread_join(tid2, NULL);
 
     printer(array1_data.array, array1_size);
     printer(array2_data.array, array2_size);
+
+    cleaner(sortArray, original_array_size);
+    printer(sortArray, original_array_size);
+    
+    merge(array1_data.array, array1_size, array2_data.array, array2_size, sortArray);
+
+    printer(sortArray, original_array_size);
 
     // create two threads w attrs
 
@@ -95,6 +144,15 @@ int main(int argc, char *argv[])
 }
 
 void *runner(void *param)
+{
+    ArrayData *data = (ArrayData *) param;
+    int *array = data->array;
+    int len = data->len;
+
+    qsort(array, len, sizeof(int), cmpfnc);
+}
+
+void *runner1(void *param)
 {
     ArrayData *data = (ArrayData *) param;
     int *array = data->array;
