@@ -5,17 +5,19 @@
 
 /* threads call this function */
 void *runner(void *param);
-void *runner1(void *param);
 
-/// @brief this structure is used to easily pass information to the individual thread functions.
+/// @brief This structure is used to easily pass information to the individual thread functions.
 typedef struct
 {
     int *array;
     int len;
 } ArrayData;
 
+/// @brief Sorts an array of integers in ascending order using bubble sort algorithm.
+/// @param intArr The array of integers to be sorted.
+/// @param arrLength The length of the array.
 void sort(int intArr[], int arrLength){
-
+;
    int i, j, temp; 
    
    for(i=0; i< arrLength-1; i++){
@@ -30,9 +32,9 @@ void sort(int intArr[], int arrLength){
 
 }
 
-/// @brief this function quickly takes in an array and prints the contents.
-/// @param intArray the array to be listed
-/// @param arrLength the length of the array
+/// @brief This function quickly takes in an array and prints the contents.
+/// @param intArray The array to be listed
+/// @param arrLength The length of the array
 void printer(int intArray[], int arrLength)
 {
     for (int i = 0; i < arrLength; i++)
@@ -41,9 +43,9 @@ void printer(int intArray[], int arrLength)
     }
 }
 
-/// @brief this function quickly fills an array with 0's.
-/// @param intArray the array to be cleaned
-/// @param arrLength the length of the array
+/// @brief This function quickly fills an array with 0's.
+/// @param intArray The array to be cleaned
+/// @param arrLength The length of the array
 void cleaner(int intArray[], int arrLength)
 {
     printf("len: %d\n", arrLength);
@@ -53,12 +55,12 @@ void cleaner(int intArray[], int arrLength)
     }
 }
 
-/// @brief function to take two arrays, the size of two arrays, and the intended array to output to and merges the two arrays to be in ascending order.
-/// @param arr1 first array
-/// @param size1 first array's size
-/// @param arr2 second array
-/// @param size2 second array's size
-/// @param merged array to be merged into.
+/// @brief Function to take two arrays, the size of two arrays, and the intended array to output to and merges the two arrays to be in ascending order.
+/// @param arr1 First array
+/// @param size1 First array's size
+/// @param arr2 Second array
+/// @param size2 Second array's size
+/// @param merged Array to be merged into.
 void merge(int arr1[], int size1, int arr2[], int size2, int merged[])
 {
     
@@ -164,9 +166,9 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-/// @brief
-/// @param param
-/// @return
+/// @brief each thread is to call this function, just calls bubblesort for each array.
+/// @param param struct holding the array data, as well as the length of the array
+/// @return void
 void *runner(void *param)
 {
     ArrayData *data = (ArrayData *)param;
