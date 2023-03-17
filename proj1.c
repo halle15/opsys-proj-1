@@ -14,13 +14,20 @@ typedef struct
     int len;
 } ArrayData;
 
-/// @brief this function is meant to be used as a comparator function for the qsort() algorithm.
-/// @param a the first param to be compared
-/// @param b the second param to be compared
-/// @return value to be used by qsort to determine order or arrays.
-int cmpfnc(const void *a, const void *b)
-{
-    return (*(int *)a - *(int *)b);
+void sort(int intArr[], int arrLength){
+
+   int i, j, temp; 
+   
+   for(i=0; i< arrLength-1; i++){
+        for(j=0; j<arrLength-i-1; j++){
+            if(intArr[j] > intArr[j+1]){
+                temp = intArr[j];
+                intArr[j] = intArr[j+1];
+                intArr[j+1] = temp;
+            }
+        }
+   }
+
 }
 
 /// @brief this function quickly takes in an array and prints the contents.
@@ -143,7 +150,7 @@ int main(int argc, char *argv[])
     printf("Calculating\n");
 
     pthread_create(&tid, &attr, runner, &array1_data);
-    pthread_create(&tid2, &attr, runner1, &array2_data);
+    pthread_create(&tid2, &attr, runner, &array2_data);
 
     pthread_join(tid, NULL);
     pthread_join(tid2, NULL);
@@ -166,14 +173,5 @@ void *runner(void *param)
     int *array = data->array;
     int len = data->len;
 
-    qsort(array, len, sizeof(int), cmpfnc);
-}
-
-void *runner1(void *param)
-{
-    ArrayData *data = (ArrayData *)param;
-    int *array = data->array;
-    int len = data->len;
-
-    qsort(array, len, sizeof(int), cmpfnc);
+    sort(array, len);    
 }
