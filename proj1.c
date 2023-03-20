@@ -29,7 +29,7 @@ void sort(int intArr[], int arrLength){
             }
         }
    }
-
+    
 }
 
 /// @brief This function quickly takes in an array and prints the contents.
