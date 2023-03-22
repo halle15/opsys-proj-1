@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define RAND_MAX 25000
+
 /* threads call this function */
 void *runner(void *param);
 
@@ -13,23 +15,28 @@ typedef struct
     int len;
 } ArrayData;
 
+// HELPER FUNCTIONS
+
 /// @brief Sorts an array of integers in ascending order using bubble sort algorithm.
 /// @param intArr The array of integers to be sorted.
 /// @param arrLength The length of the array.
-void sort(int intArr[], int arrLength){
-;
-   int i, j, temp; 
-   
-   for(i=0; i< arrLength-1; i++){
-        for(j=0; j<arrLength-i-1; j++){
-            if(intArr[j] > intArr[j+1]){
+void sort(int intArr[], int arrLength)
+{
+    ;
+    int i, j, temp;
+
+    for (i = 0; i < arrLength - 1; i++)
+    {
+        for (j = 0; j < arrLength - i - 1; j++)
+        {
+            if (intArr[j] > intArr[j + 1])
+            {
                 temp = intArr[j];
-                intArr[j] = intArr[j+1];
-                intArr[j+1] = temp;
+                intArr[j] = intArr[j + 1];
+                intArr[j + 1] = temp;
             }
         }
-   }
-    
+    }
 }
 
 /// @brief This function quickly takes in an array and prints the contents.
@@ -55,6 +62,21 @@ void cleaner(int intArray[], int arrLength)
     }
 }
 
+/// @brief This function quickly takes in an array and fills the content with random numbers. Will rewrite array contents.
+/// @param intArray The array to be listed
+/// @param arrLength The length of the array
+void filler(int intArray[], int arrLength)
+{
+    cleaner(intArray, arrLength);
+    for (int i = 0; i < arrLength; i++)
+    {
+        intArray[i] = rand() % RAND_MAX; // this ensures that if the rand() number is higher than the specified amt, the number will roll over and not be egregiously large.
+        // printf("PUT %d AT %d\n", intArray[i], i); test function
+    }
+}
+
+// MAIN FUNCTIONALITY
+
 /// @brief Function to take two arrays, the size of two arrays, and the intended array to output to and merges the two arrays to be in ascending order.
 /// @param arr1 First array
 /// @param size1 First array's size
@@ -63,16 +85,15 @@ void cleaner(int intArray[], int arrLength)
 /// @param merged Array to be merged into.
 void merge(int arr1[], int size1, int arr2[], int size2, int merged[])
 {
-    
+
     // init 3 index values
     int index1 = 0;
     int index2 = 0;
     int indexResult = 0;
 
-
     // Traverse both arrays at the same time until one is fully processed
     while (index1 < size1 && index2 < size2)
-    {   
+    {
         // if first element is lteq to second element, add first to the result.
         if (arr1[index1] <= arr2[index2])
         {
@@ -104,7 +125,7 @@ void merge(int arr1[], int size1, int arr2[], int size2, int merged[])
     }
 }
 
-/// @brief the main function loop responsible for taking in user input, taking in the numbers to be sorted, 
+/// @brief the main function loop responsible for taking in user input, taking in the numbers to be sorted,
 /// calling the sorting threads, then for the final merge and output to user.
 /// @return returns 1 on success, exception or -1 on failure.
 int main(int argc, char *argv[])
@@ -118,10 +139,9 @@ int main(int argc, char *argv[])
 
     int sortArray[original_array_size];
 
-    for (int i = 0; i < original_array_size; i++)
-    {
-        scanf("%d", &sortArray[i]);
-    }
+    printf("Filling array with random numbers...\n");
+
+    filler(sortArray, original_array_size); // call helper function to randomly gen numbers to be sorted.
 
     int array1_size = original_array_size / 2;
     int array2_size = original_array_size - array1_size;
@@ -146,24 +166,24 @@ int main(int argc, char *argv[])
     pthread_t tid2;       /* second thread identifier */
     pthread_attr_t attr2; /* second thread attr */
 
-    pthread_attr_init(&attr);
+    pthread_attr_init(&attr); // initialize both threads
     pthread_attr_init(&attr2);
 
     printf("Calculating\n");
 
-    pthread_create(&tid, &attr, runner, &array1_data);
+    pthread_create(&tid, &attr, runner, &array1_data); // create the threads and pass relevant data to them to be calc'd
     pthread_create(&tid2, &attr, runner, &array2_data);
 
-    pthread_join(tid, NULL);
+    pthread_join(tid, NULL); // when finished, join threads back to main
     pthread_join(tid2, NULL);
 
-    cleaner(sortArray, original_array_size);
+    cleaner(sortArray, original_array_size); // clean out the original array to be used as storage for sorted array. why allocate new memory?
 
-    merge(array1_data.array, array1_size, array2_data.array, array2_size, sortArray);
+    merge(array1_data.array, array1_size, array2_data.array, array2_size, sortArray); // call the merge helper function to merge two sorted arrays.
 
-    printer(sortArray, original_array_size);
+    printer(sortArray, original_array_size); // print out the contents of the array.
 
-    return 0;
+    return 1; // return with a success code
 }
 
 /// @brief each thread is to call this function, just calls bubblesort for each array.
@@ -175,5 +195,5 @@ void *runner(void *param)
     int *array = data->array;
     int len = data->len;
 
-    sort(array, len);    
+    sort(array, len);
 }
